@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://www.tchad-eco.com
+
+# Sitemaps
+Sitemap: https://www.tchad-eco.com/sitemap.xml
