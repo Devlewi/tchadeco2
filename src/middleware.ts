@@ -4,54 +4,54 @@ import type { NextRequest } from "next/server";
 import { i18n } from "../i18n-config";
 
 export function middleware(request: NextRequest) {
-  const pathname = request.nextUrl.pathname;
+  const { pathname, search } = request.nextUrl;
 
-  // 1. Liste d'exclusion (On ajoute ads.txt car il était en 302 dans tes logs)
-  const excludedPaths = [
-    '/sitemap.xml', 
-    '/robots.txt', 
-    '/favicon.ico',
-    '/ads.txt',
-    '/fonts/ts-icons4e17.woff2',
-    '/js/f6927642ba9082ad8dc3ee9ebfa2ee4f.js',
-    '/js/436c92d375871a4de2f9bca5482b318f.js',
-    '/js/26163b5c5f9f5b17b1a824a3bcf585c9.js',
-    '/js/95d48ebe0fd227993325d142e6b718ef.js',
-    '/js/059cf10036c1aff6209bc1476002b48d.js',
-    '/js/bec7ef33f65e3d23332c9bb50b07ff9a.js',
-    '/js/bc39a8b646d1336276bcbdd278bd276f.js',
-  ];
-
-  // 2. SÉCURITÉ : On exclut TOUT ce qui commence par /js/ ou /fonts/ 
-  // Même si le fichier n'est pas dans la liste au-dessus, on ne le redirige PAS.
+  // 1. EXCLUSIONS : On laisse passer les fichiers statiques, API et fichiers système
   if (
-    excludedPaths.includes(pathname) || 
-    pathname.startsWith('/js/') || 
+    pathname.includes('.') || 
+    pathname.startsWith('/api/') || 
+    pathname.startsWith('/_next/') ||
+    pathname.startsWith('/js/') ||
     pathname.startsWith('/fonts/') ||
-    pathname.includes('.') // Si l'URL contient un point, c'est un fichier -> on laisse passer
+    pathname === '/sitemap.xml' ||
+    pathname === '/robots.txt' ||
+    pathname === '/ads.txt'
   ) {
     return NextResponse.next();
   }
 
-  // 3. Redirection /en vers /fr
-  if (pathname === "/en" || pathname.startsWith("/en/")) {
-    const suffix = pathname.startsWith("/en/") ? pathname.slice(4) : "";
-    return NextResponse.redirect(new URL(`/fr/${suffix}`, request.url));
+  // 2. RACINE "/" -> REWRITE vers "/fr"
+  // L'URL reste https://votre-site.com/ mais affiche le contenu de /fr
+  // C'est indispensable pour que Google Search Console ne voit pas de redirection sur l'accueil
+  if (pathname === "/") {
+    return NextResponse.rewrite(new URL(`/fr${search}`, request.url));
   }
 
-  // 4. Forcer /fr pour les pages
-  const pathLocale = i18n.locales.find(
+  // 3. REDIRECTION /en -> /fr (Si le site est passé en français)
+  // Utilise 301 (Permanent) pour que Google transfère le SEO de l'anglais vers le français
+  if (pathname.startsWith("/en/") || pathname === "/en") {
+    const newPath = pathname.replace("/en", "/fr");
+    return NextResponse.redirect(new URL(`${newPath}${search}`, request.url), 301);
+  }
+
+  // 4. VÉRIFIER SI LA LOCALE EST PRÉSENTE
+  const pathnameHasLocale = i18n.locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  if (!pathLocale) {
-    return NextResponse.redirect(new URL(`/fr${pathname}`, request.url));
+  // 5. SI PAS DE LOCALE -> REWRITE vers "/fr"
+  // Exemple: /mon-article devient /fr/mon-article de manière invisible pour l'utilisateur
+  if (!pathnameHasLocale) {
+    return NextResponse.rewrite(
+      new URL(`/fr${pathname}${search}`, request.url)
+    );
   }
 
   return NextResponse.next();
 }
 
-// 5. MATCHER : On ajoute js et fonts ici pour que le middleware ne les touche même pas
+// 6. MATCHER : On exclut les dossiers ressources pour optimiser les performances
 export const config = {
-  matcher: "/((?!api|_next/static|_next/image|js|fonts|img|favicon.ico).*)",
+  matcher: ["/((?!api|_next/static|_next/image|js|fonts|img|favicon.ico|robots.txt|sitemap.xml|ads.txt).*)"],
 };
+
