@@ -136,7 +136,7 @@ data-element_type="section"
               className="has-el-gap el-gap-default elementor-section elementor-top-section elementor-element elementor-element-aab5c4e elementor-section-boxed elementor-section-height-default elementor-section-height-default pt-7 md:pt-0"
               data-id="aab5c4e"
               data-element_type="section"
-              style={{ background: "#1f3162", marginBottom: 40, marginTop:-20 }}
+              style={{ background: "#1f3162", marginBottom: 0, marginTop:-20 }}
             >
               <div className="elementor-container elementor-column-gap-no">
                 <div

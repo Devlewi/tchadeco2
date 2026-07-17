@@ -10,7 +10,7 @@ admanmedia.com, 556, RESELLER
 
 
 
-OWNERDOMAIN=people237.com
+OWNERDOMAIN=tchad-eco.com
 MANAGERDOMAIN=themoneytizer.com
 themoneytizer.com,5637,DIRECT
 smartadserver.com,1097,DIRECT
