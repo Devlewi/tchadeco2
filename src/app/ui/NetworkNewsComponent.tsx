@@ -45,9 +45,12 @@ const getFlagPath = (siteName: string, locale: string): string | null => {
     "burkina": "drapeau-faso.png",
     
     "benin": "drapeau-benin.png",
+    "bénin": "drapeau-benin.png",
+    "benin eco": "drapeau-benin.png",
     
-    "brazzaville": "drapeau-brazza.png",
-    "congo brazzaville": "drapeau-brazza.png",
+    "brazzaville": "drapeau-congo.png",
+    "congo brazzaville": "drapeau-congo.png",
+    "congo": "drapeau-congo.png",
     
     "guinée équatoriale": "drapeau-guinnee-equa.png",
     "guinee equatoriale": "drapeau-guinnee-equa.png",
@@ -67,6 +70,8 @@ const getFlagPath = (siteName: string, locale: string): string | null => {
     "niger": "drapeau-niger.png",
     "togo": "drapeau-togo.png",
     "bangui": "drapeau-bangui.png",
+    "ghana": "drapeau-ghana.png",
+    "gh": "drapeau-ghana.png",
   };
 
   // Cherche si un des mots-clés est contenu dans le nom du site
@@ -87,7 +92,9 @@ const NetworkNewsSectionComponent: React.FC<Props> = async ({ locale }) => {
   const rawArticles = await fetchEcoxNetworkNews();
   const articles = (rawArticles || []) as NetworkArticle[];
 
-  const sectionTitle = locale === "fr" ? "L'ACTUALITÉ AFRICAINE" : "L'ACTUALITÉ AFRICAINE";
+  const sectionTitle = locale === "fr"
+  ? "L'ACTUALITÉ ECONOMIQUE AFRICAINE"
+  : "AFRICAN ECONOMIC NEWS";
 
   // Si le flux est vide ou inaccessible, on n'affiche rien du tout
   if (articles.length === 0) return null;
@@ -109,7 +116,7 @@ const NetworkNewsSectionComponent: React.FC<Props> = async ({ locale }) => {
           className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
           style={{ columnGap: "20px", rowGap: "24px" }}
         >
-          {articles.slice(0, 10).map((article) => {
+          {articles.slice(0, 17).map((article) => {
             
             // Logique intelligente sécurisée contre les erreurs de type sur credit_photo
             const displayCredit = 
